@@ -34,12 +34,6 @@ class DQN:
         
         self.Q.to(device)
         self.optimizer = torch.optim.AdamW(self.Q.parameters(), lr=lr)
-
-    def select_action(self, obs) -> torch.Tensor:
-        with torch.no_grad():
-            obs = torch.Tensor(obs)
-            return torch.argmax(self.Q.forward(obs))
-        
     
     def update(self, batch) -> None:
         # Batch is a list of tuples from the replay buffer
@@ -54,11 +48,11 @@ class DQN:
         #print(terminated)
 
         # Get the next values
-        next_values = torch.max(self.Q.forward(next_states), dim=1).values
+        with torch.no_grad():
+            next_values = torch.max(self.Q.forward(next_states), dim=1).values
 
         # Use terminated to mask next_values
-        next_values[terminated] = 0
-
+        next_values = next_values.masked_fill(terminated, 0)
         y = rewards + self.gamma * next_values
 
         value_estimates = self.Q.forward(states)
@@ -81,14 +75,33 @@ class DQN:
         self.seed = seed
 
     def plot_reward(self, rewards: list) -> None:
-        plt.plot(rewards)
-        plt.show()
+        fig, axs = plt.subplots(2,2, figsize=(10,5))
+        #Plot the rewards
+        
+        axs[0,0].plot(rewards)
+        axs[0,0].set_title("Reward")
+        axs[0,0].set_xlabel("Time")
+        axs[0,0].set_ylabel("Reward")
 
         #Plot the cumulative reward
-        cumulative = []
+        cumulative = [0]
         for i in range(len(rewards)):
-            cumulative.append(sum(rewards[:i+1]))
-        plt.plot(cumulative)
+            cumulative.append(cumulative[i]+rewards[i])
+        axs[1,0].plot(cumulative)
+        axs[1,0].set_title("Cumulative Reward")
+        axs[1,0].set_xlabel("Episode")
+        axs[1,0].set_ylabel("Reward")
+
+        #Plot the moving average
+        moving_average = []
+        for i in range(len(rewards)):
+            moving_average.append(np.mean(rewards[max(0,i-10):min(len(rewards),i+10)]))
+        axs[0,1].plot(moving_average)
+        axs[0,1].set_title("Moving Average")
+        axs[0,1].set_xlabel("Episode")
+        axs[0,1].set_ylabel("Reward")
+        #Space out the subplots by a bit
+        plt.tight_layout()
         plt.show()
 
     def reinit_weights(self) -> None:
@@ -119,10 +132,10 @@ class DQN:
                 if rand < epsilon:
                     action = torch.randint(self.env.action_space.n, (1,))
                 else:
-
-                    estimates = self.Q.forward(torch.from_numpy(observation).float().to(self.device))
+                    with torch.no_grad():
+                        estimates = self.Q.forward(torch.from_numpy(observation).float().to(self.device))
                     #print(f"TIME: {t}, Episode: {episode}, estimates: ", estimates)
-                    action = torch.argmax(estimates).item() 
+                        action = torch.argmax(estimates).item() 
                 
                 #print("Action off device: ", action)
                 observation_prime, reward, terminated, truncated, info = self.env.step(action)                    

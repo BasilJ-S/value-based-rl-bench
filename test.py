@@ -54,9 +54,5 @@ class TestDQN(unittest.TestCase):
         self.assertEqual(len(self.dqn.optimizer.param_groups), 1)
         
 
-
-
-
-
 if __name__ == '__main__':
     unittest.main(verbosity=2)
