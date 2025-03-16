@@ -1,6 +1,7 @@
 
 from hmac import new
 from tokenize import Double
+from collections import deque
 import torch
 import numpy as np
 import gymnasium as gym
@@ -10,13 +11,14 @@ from tqdm import tqdm
 
 
 class DQN:
-    def __init__(self, env: gym.Env, lr: float, gamma: float = 0.99, device = 'cpu', seed: int = 23):
+    def __init__(self, env: gym.Env, lr: float, gamma: float = 0.99, epsilon = 0.1, device = 'cpu', seed: int = 23):
         self.env = env
         self.lr = lr
         self.seed = seed
         self.device = device
         self.seed_model(seed)
         self.gamma = gamma
+        self.epsilon = epsilon
 
         # We have 1d observations for this assignment, but adding more for more general case
         self.observation_size = 1
@@ -119,13 +121,16 @@ class DQN:
 
     def select_action(self, observation: torch.Tensor) -> int:
         # Take in observation from env, return action
-        with torch.no_grad():
-            estimates = self.Q.forward(observation)
-        return torch.argmax(estimates).item()
+        rand = np.random.rand() 
+        if rand < self.epsilon:
+            return np.random.randint(0,self.env.action_space.n)
+        else:
+            with torch.no_grad():
+                estimates = self.Q.forward(torch.from_numpy(observation).float().to(self.device))
+            return torch.argmax(estimates).item()        
 
-
-    def train(self, num_episodes: int, episode_len: int, epsilon: float = 0.3, use_buffer = False, 
-              replay: int = 1e7, batch_size: int = 32, plot_results = False) -> None:
+    def train(self, num_episodes: int, episode_len: int, render = True, use_buffer = False, 
+              replay: int = 1000000, batch_size: int = 32, plot_results = False) -> None:
         # Collect episode 
         # update replay buffer if you have one
         # update the Neural network 
@@ -133,11 +138,11 @@ class DQN:
 
         self.seed_model(self.seed)
 
-        D = []
+        D = deque(maxlen=replay)
         rewards = []
 
         for episode in tqdm(range(num_episodes)):
-            if False and episode == num_episodes - 1:
+            if render and episode == num_episodes - 1:
                 new_env = gym.make(self.env.spec.id, render_mode='human')
                 self.env.close()
                 self.env = new_env
@@ -149,11 +154,7 @@ class DQN:
             #print(type(observation))
             #print(observation.shape)
             for t in range(episode_len):
-                rand = np.random.rand() 
-                if rand < epsilon:
-                    action = np.random.randint(0,self.env.action_space.n)
-                else:
-                    action = self.select_action(torch.from_numpy(observation).float().to(self.device))
+                action = self.select_action(observation)
                 
                 #print("Action off device: ", action)
                 observation_prime, reward, terminated, truncated, info = self.env.step(action)                    
@@ -164,7 +165,8 @@ class DQN:
                 if use_buffer:
                     D.append((observation, action, reward, observation_prime, terminated or truncated))
                     if len(D) > replay:
-                        D.pop(0)
+                        #D.pop(0)
+                        pass
                     if len(D) > batch_size:
                         try:
                             # I THINK IT's looking across dimensions. Look later

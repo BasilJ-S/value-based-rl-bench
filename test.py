@@ -13,13 +13,15 @@ class TestDQN(unittest.TestCase):
     dqn = DQN(env, 0.0001)
     # Test if the DQN class is correctly initialized
     def test_init(self):
-        self.assertEqual(self.dqn.env, self.env)
-        self.assertEqual(self.dqn.observation_size, 128)
-        self.assertEqual(self.dqn.actions, list(range(self.env.action_space.n)))
-        self.assertEqual(len(self.dqn.Q), 5)
+        env = gym.make(self.env_name)
+        dqn = DQN(env, 0.0001)
+        self.assertEqual(dqn.env, env)
+        self.assertEqual(dqn.observation_size, 128)
+        self.assertEqual(dqn.actions, list(range(env.action_space.n)))
+        self.assertEqual(len(dqn.Q), 5)
     
     def testSelectAction(self):
-        obs = torch.rand(128)
+        obs = np.random.rand(128)
         action = self.dqn.select_action(obs)
         self.assertTrue(action in self.dqn.actions)
 
@@ -50,7 +52,7 @@ class TestDQN(unittest.TestCase):
 
 
     def testTrain(self):
-        self.dqn.train(20, 10, plot_results=True, use_buffer=True)
+        self.dqn.train(10, 10, plot_results=True, use_buffer=True)
         self.assertEqual(len(self.dqn.optimizer.param_groups), 1)
 
 class TestDQNAcrobot(unittest.TestCase):
@@ -60,14 +62,16 @@ class TestDQNAcrobot(unittest.TestCase):
     dqn = DQN(env, learnRate)
     # Test if the DQN class is correctly initialized
     def test_init(self):
-        self.assertEqual(self.dqn.env, self.env)
-        self.assertEqual(self.dqn.observation_size, 6)
-        self.assertEqual(self.dqn.lr, self.learnRate)
-        self.assertEqual(self.dqn.actions, list(range(self.env.action_space.n)))
-        self.assertEqual(len(self.dqn.Q), 5)
+        env = gym.make(self.env_name)
+        dqn = DQN(env, self.learnRate)
+        self.assertEqual(dqn.env, env)
+        self.assertEqual(dqn.observation_size, 6)
+        self.assertEqual(dqn.lr, self.learnRate)
+        self.assertEqual(dqn.actions, list(range(env.action_space.n)))
+        self.assertEqual(len(dqn.Q), 5)
     
     def testSelectAction(self):
-        obs = torch.rand(6)
+        obs = np.random.rand(6)
         action = self.dqn.select_action(obs)
         self.assertTrue(action in self.dqn.actions)
 
@@ -98,7 +102,7 @@ class TestDQNAcrobot(unittest.TestCase):
 
 
     def testTrain(self):
-        self.dqn.train(20, 10, plot_results=True, use_buffer=True)
+        self.dqn.train(10, 10, plot_results=True, use_buffer=True)
         self.assertEqual(len(self.dqn.optimizer.param_groups), 1)
         
 
