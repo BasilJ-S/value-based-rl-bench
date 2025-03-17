@@ -15,7 +15,7 @@ for file in files:
         print(f"{file} not found")
         continue
 
-    fig, axs = plt.subplots(2,2, figsize=(10,5))
+    fig, axs = plt.subplots(2,2, figsize=(10,7))
 
 
     for hyperparams in rewards:
@@ -48,8 +48,16 @@ for file in files:
         axs[0,1].set_ylabel("Reward")
         #axs[0,1].legend(loc='upper left', bbox_to_anchor=(1.02, 1))
 
+        #Plot the average reward over the last 100 episodes
+        avg100 = np.mean(means[-100:])
+        axs[1,1].bar(hyperparams, avg100)
+        axs[1,1].set_title("Average Reward over Last 100 Episodes")
+        axs[1,1].set_ylabel("Reward")
+        axs[1,1].set_xlabel("Hyperparameters")  
+    axs[1,1].set_xticks(axs[1,1].get_xticks())  # Ensure ticks are set
+    axs[1,1].set_xticklabels(axs[1,1].get_xticklabels(), rotation=45, ha='right', fontsize=6)  # Rotate and align ticks
     handles, labels = axs[0,0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1.1, 1))
+    fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1.2, 1))
 
     fig.suptitle(f"{file[:-13]} Results")
     #Space out the subplots by a bit
