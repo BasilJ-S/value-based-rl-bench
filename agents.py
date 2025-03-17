@@ -27,9 +27,9 @@ class DQN:
         
         self.actions = list(range(env.action_space.n))
         self.Q = torch.nn.Sequential(
-            torch.nn.Linear(self.observation_size, 256),
+            torch.nn.Linear(self.observation_size, 128),
             torch.nn.ReLU(),
-            torch.nn.Linear(256, 64),
+            torch.nn.Linear(128, 64),
             torch.nn.ReLU(),
             torch.nn.Linear(64, env.action_space.n)
         )
@@ -91,9 +91,7 @@ class DQN:
         axs[0,0].set_ylabel("Reward")
 
         #Plot the cumulative reward
-        cumulative = [0]
-        for i in range(len(rewards)):
-            cumulative.append(cumulative[i]+rewards[i])
+        cumulative = np.cumsum(rewards)
         axs[1,0].plot(cumulative)
         axs[1,0].set_title("Cumulative Reward")
         axs[1,0].set_xlabel("Episode")
@@ -130,7 +128,7 @@ class DQN:
             return torch.argmax(estimates).item()        
 
     def train(self, num_episodes: int, episode_len: int, render = True, use_buffer = False, 
-              replay: int = 1000000, batch_size: int = 32, plot_results = False) -> None:
+              replay: int = 1000000, batch_size: int = 16, plot_results = False) -> None:
         # Collect episode 
         # update replay buffer if you have one
         # update the Neural network 
@@ -141,7 +139,7 @@ class DQN:
         D = deque(maxlen=replay)
         rewards = []
 
-        for episode in tqdm(range(num_episodes)):
+        for episode in tqdm(range(num_episodes), leave=False, desc="Episodes"):
             if render and episode == num_episodes - 1:
                 new_env = gym.make(self.env.spec.id, render_mode='human')
                 self.env.close()
@@ -153,7 +151,9 @@ class DQN:
             observation, _ = self.env.reset(seed=self.seed + episode) # ADD epsiode so the seed is different for each episode
             #print(type(observation))
             #print(observation.shape)
-            for t in range(episode_len):
+            t = -1
+            while t < episode_len:
+                t += 1
                 action = self.select_action(observation)
                 
                 #print("Action off device: ", action)
@@ -192,6 +192,8 @@ class DQN:
         self.env.close()
         if plot_results:
             self.plot_reward(rewards)
+
+        return rewards
 
 
                     
