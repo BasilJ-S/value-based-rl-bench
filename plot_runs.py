@@ -4,7 +4,7 @@ import json
 import numpy as np
 
 
-files = ['Acrobot_results.json', 'Assault_results.json']
+files = ['ExpectedSarsa_Acrobot_results.json', 'DQN_Acrobot_results.json','ExpectedSarsa_Assault_results.json', 'DQN_Assault_results.json']
 
 
 for file in files:

@@ -4,7 +4,7 @@ import torch
 import unittest
 import os
 import gymnasium as gym
-from agents import DQN
+from agents import DQN, ExpectedSarsa
 import numpy as np
 
 class TestDQN(unittest.TestCase):
@@ -52,7 +52,7 @@ class TestDQN(unittest.TestCase):
 
 
     def testTrain(self):
-        self.dqn.train(10, 10, plot_results=True, use_buffer=True)
+        self.dqn.train(10, 10, plot_results=False, use_buffer=True, render=False)
         self.assertEqual(len(self.dqn.optimizer.param_groups), 1)
 
 class TestDQNAcrobot(unittest.TestCase):
@@ -102,8 +102,33 @@ class TestDQNAcrobot(unittest.TestCase):
 
 
     def testTrain(self):
-        self.dqn.train(10, 10, plot_results=True, use_buffer=True)
+        self.dqn.train(10, 10, plot_results=False, use_buffer=True, render=False)
         self.assertEqual(len(self.dqn.optimizer.param_groups), 1)
+
+class TestExpectedSarsa(unittest.TestCase):
+    env_name = 'Acrobot-v1'
+    env = gym.make(env_name)
+    learnRate = 0.0001
+    eSarsa = ExpectedSarsa(env, learnRate)
+    
+    def testSingleUpdate(self):
+        obs = np.random.rand(self.eSarsa.observation_size)
+        action = np.random.randint(0,3)
+        reward = 0.5
+        next_obs = np.random.rand(self.eSarsa.observation_size)
+        terminated = np.random.randint(0, 2) < 1
+        old = self.eSarsa.Q[0].weight.clone()
+        self.eSarsa.update([(obs, action, reward, next_obs, terminated)])
+        self.assertEqual(len(self.eSarsa.optimizer.param_groups), 1)
+        # Assert that model weights change
+        new = self.eSarsa.Q[0].weight.clone()
+        self.assertFalse(torch.equal(old, new))
+
+    def testBatchUpdate(self):
+        batch = [(np.random.rand(self.eSarsa.observation_size), np.random.randint(0,3), 0.5, np.random.rand(self.eSarsa.observation_size), np.random.randint(0, 2) < 1) for i in range(32)]
+        self.eSarsa.update(batch)
+        self.assertEqual(len(batch), 32)
+        self.assertEqual(len(self.eSarsa.optimizer.param_groups), 1)
         
 
 if __name__ == '__main__':
