@@ -102,7 +102,7 @@ for fig,axs in [(fig_acrobot, axs_acrobot), (fig_nobuffer_acrobot, axs_nobuffer_
     fig.suptitle(f"{figurenames[i]}")
     #Space out the subplots by a bit
     fig.tight_layout()
-    fig.savefig(f'figure_{i}.png', bbox_inches='tight', dpi = 300)
+    fig.savefig(f'Plots/{figurenames[i]}.png', bbox_inches='tight', dpi = 300)
     i += 1
 
 
@@ -149,7 +149,8 @@ for file in files:
     # map to string
     fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1.2, 1))
     #Space out the subplots by a bit
-    fig.suptitle(file)
+    title = file.split('.')[0]
+    fig.suptitle(title)
     fig.tight_layout()
-    fig.savefig(f'{file}.png', bbox_inches='tight', dpi = 300)
+    fig.savefig(f'Plots/{title}.png', bbox_inches='tight', dpi = 300)
     i += 1
