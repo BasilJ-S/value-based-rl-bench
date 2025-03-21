@@ -62,10 +62,12 @@ for file in files:
 
         #Plot the cumulative reward
         cumulative = np.cumsum(means)
+        std_devs = np.cumsum(stds)
         ax[1,0].plot(cumulative, label = hyperparams, linestyle = linestyle, color = colour)
         ax[1,0].set_title("Cumulative Reward")
         ax[1,0].set_xlabel("Episode")
         ax[1,0].set_ylabel("Reward")
+        ax[1,0].fill_between(range(len(cumulative)), cumulative-std_devs, cumulative+std_devs, alpha=0.1, color = colour)
         #ax[1,0].legend(loc='upper left', bbox_to_anchor=(1.02, 1))
 
         #Plot the moving average
