@@ -5,6 +5,7 @@ import unittest
 import os
 import gymnasium as gym
 from agents import DQN, ExpectedSarsa
+from policy_agents import REINFORCE
 import numpy as np
 
 class TestDQN(unittest.TestCase):
@@ -129,6 +130,32 @@ class TestExpectedSarsa(unittest.TestCase):
         self.eSarsa.update(batch)
         self.assertEqual(len(batch), 32)
         self.assertEqual(len(self.eSarsa.optimizer.param_groups), 1)
+
+class TestREINFORCE(unittest.TestCase):
+    env_name = 'Acrobot-v1'
+    env = gym.make(env_name)
+    learnRate = 0.0001
+    reinforce = REINFORCE(env, learnRate)
+
+    def testSingleUpdate(self):
+        obs = np.random.rand(self.reinforce.observation_size)
+        action = np.random.randint(0,3)
+        reward = 0.5
+        next_obs = np.random.rand(self.reinforce.observation_size)
+        terminated = np.random.randint(0, 2) < 1
+        old = self.reinforce.z[0].weight.clone()
+        self.reinforce.update([(obs, action, reward, next_obs, terminated)])
+        self.assertEqual(len(self.reinforce.optimizer.param_groups), 1)
+        # Assert that model weights change
+        new = self.reinforce.z[0].weight.clone()
+        self.assertFalse(torch.equal(old, new))
+
+    def testBatchUpdate(self):
+        batch = [(np.random.rand(self.reinforce.observation_size), np.random.randint(0,3), 0.5, np.random.rand(self.reinforce.observation_size), np.random.randint(0, 2) < 1) for i in range(32)]
+        self.reinforce.update(batch)
+        self.assertEqual(len(batch), 32)
+        self.assertEqual(len(self.reinforce.optimizer.param_groups), 1)
+
         
 
 if __name__ == '__main__':
