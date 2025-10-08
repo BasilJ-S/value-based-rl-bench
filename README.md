@@ -28,29 +28,28 @@ Both algorithms use a neural network (128→64→actions) as the Q-function appr
 - RMSprop optimizer
 - Hyperparameter grid search (learning rate, epsilon, buffer on/off)
 
-## Usage
+## Setup (Poetry)
 
-Train agents:
+This repository uses Poetry to manage dependencies and virtual environments. A `pyproject.toml` and `poetry.lock` are included. This project was built with poor dependency management, which has resulted in an overly restrictive set of requirements.
 
-```python
-from agents import DQN, ExpectedSarsa
-import gymnasium as gym
-
-env = gym.make('Acrobot-v1')
-agent = ExpectedSarsa(env, lr=0.001, epsilon=0.1)
-rewards = agent.train(num_episodes=1000, episode_len=1e10, use_buffer=True)
-```
-
-Run experiments:
+1. Install Poetry (if you don't have it) — see https://python-poetry.org for the preferred installation method for your system. Once installed, from the project root run:
 
 ```bash
-python run_experiments.py
+poetry install
+```
+
+2. Run scripts through Poetry so they use the managed environment:
+
+Run the experiments script:
+
+```bash
+poetry run python run_experiments.py
 ```
 
 Generate plots from results:
 
 ```bash
-python plot_runs.py
+poetry run python plot_runs.py
 ```
 
 ## Files
@@ -59,6 +58,8 @@ python plot_runs.py
 - `run_experiments.py`: Hyperparameter sweep across both environments
 - `plot_runs.py`: Visualization of results
 - `test.py`: Unit tests
+- `pyproject.toml` / `poetry.lock`: Poetry dependency and lock files (preferred way to install dependencies)
+- `requirements.txt`: legacy pip-style requirements (kept for convenience but Poetry is recommended)
 - `*.json`: Experimental results (10 runs × hyperparameters)
 
 ## Results
