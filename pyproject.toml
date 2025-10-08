@@ -18,102 +18,27 @@ pygame = "2.1.3"
 
 # PyTorch ecosystem (macOS MPS version)
 torch = "2.5.1"
-torchvision = {version = "*", optional = true}
 
 # Scientific computing
 numpy = "1.26.4"
 scipy = "1.15.1"
 pandas = "2.2.3"
-numexpr = "2.10.1"
-bottleneck = "1.4.2"
-sympy = "1.13.1"
-mpmath = "1.3.0"
+
 
 # Visualization
 matplotlib = "3.10.0"
-contourpy = "1.3.1"
-cycler = "0.11.0"
-fonttools = "4.55.3"
-kiwisolver = "1.4.8"
-pillow = "11.1.0"
-pyparsing = "3.2.0"
 
-# Jupyter/IPython
-ipython = "9.0.2"
-ipykernel = "6.29.5"
-jupyter-client = "8.6.3"
-jupyter-core = "5.7.2"
-ipython-pygments-lexers = "1.1.1"
 matplotlib-inline = "0.1.7"
 
-# Utilities
-cloudpickle = "3.0.0"
-filelock = "3.13.1"
-fsspec = "2024.12.0"
-networkx = "3.4.2"
-jinja2 = "3.1.5"
-markupsafe = "3.0.2"
 tqdm = "4.67.1"
-requests = "2.32.3"
-click = "8.1.8"
-deprecated = "1.2.13"
-wrapt = "1.17.0"
 
-# HTTP/Network
-certifi = "2025.1.31"
-charset-normalizer = "3.4.1"
-idna = "3.10"
-urllib3 = "2.3.0"
-
-# Terminal/Interactive
-traitlets = "5.14.3"
-prompt-toolkit = "3.0.50"
-pygments = "2.19.1"
-wcwidth = "0.2.13"
-decorator = "5.2.1"
-pexpect = "4.9.0"
-ptyprocess = "0.7.0"
-pickleshare = "0.7.5"
-jedi = "0.19.2"
-parso = "0.8.4"
-stack-data = "0.6.3"
-executing = "2.1.0"
-asttokens = "3.0.0"
-pure-eval = "0.2.3"
-
-# Async/Concurrency
-tornado = "6.4.2"
-pyzmq = "26.2.0"
-nest-asyncio = "1.6.0"
-comm = "0.2.2"
 
 # Date/Time
 python-dateutil = "2.9.0.post0"
 pytz = "2024.1"
 
-# Other dependencies
-importlib-metadata = "7.0.1"
-importlib-resources = "6.5.2"
-zipp = "3.21.0"
-packaging = "24.2"
-platformdirs = "4.3.6"
-typing-extensions = "4.12.2"
-six = "1.16.0"
-setuptools = "75.8.0"
-wheel = "0.45.1"
-psutil = "5.9.0"
-debugpy = "1.8.11"
-exceptiongroup = "1.2.2"
-farama-notifications = "0.0.4"
-jax-jumpy = "1.0.0"
-opentelemetry-api = "1.26.0"
-unicodedata2 = "15.1.0"
 
-# macOS specific (only installed on macOS)
-appnope = {version = "0.1.4", markers = "sys_platform == 'darwin'"}
 
-[tool.poetry.group.dev.dependencies]
-# Add development dependencies here if needed
 
 [build-system]
 requires = ["poetry-core"]
@@ -121,8 +46,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.extras]
 vision = ["torchvision"]
-
-# Platform-specific notes:
-# This configuration is for macOS ARM64 (Apple Silicon) with MPS backend
-# PyTorch 2.5.1 with gpu_mps support
-# If you need to use this on Linux with CUDA, you'll need to adjust torch dependencies
