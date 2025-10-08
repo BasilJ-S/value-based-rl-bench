@@ -75,4 +75,4 @@ Results are saved as `figure_[Model]_[Env]_results.json.png`.
 
 ## Note
 
-This implementation includes some starter code as part of a course assignment (COMP579 (McGill University, A3)).
+This implementation includes some starter code as part of a course assignment (COMP579 A3, McGill University).
