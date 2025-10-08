@@ -35,7 +35,7 @@ This repository uses Poetry to manage dependencies and virtual environments. A `
 1. Install Poetry (if you don't have it) — see https://python-poetry.org for the preferred installation method for your system. Once installed, from the project root run:
 
 ```bash
-poetry install
+poetry install --no-root
 ```
 
 2. Run scripts through Poetry so they use the managed environment:
